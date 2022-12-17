@@ -4,13 +4,13 @@
 
 _TLDR: This propagates specified tags from the Lambda function that generated the logs to the CloudWatch Logs log group where the logs are stored._
 
-Logs from Lambda functions are stored in CloudWatch Logs by default. If a CloudWatch Logs log group does not exist already, one will be created automatically the first time a function executes (if the function execution role has permission).
+Logs from Lambda functions are stored in CloudWatch Logs by default. If a CloudWatch Logs log group does not exist already, AWS Lambda will create one automatically the first time a function executes (if the function execution role has permission).
 
-Lambda functions may have been meticulously tagged during deployment for cost allocation or attribute-based access control (ABAC) purposes. This Terraform module / AWS [Lambda function](https://github.com/brightbock/cloudwatch-logs-tag/blob/main/src/lambda.py) will ensure each function's CloudWatch Logs log group is correspondingly tagged.
+Lambda functions may have been meticulously tagged during deployment for cost allocation or attribute-based access control (ABAC) purposes. This Terraform module / AWS [Lambda function](https://github.com/brightbock/cloudwatch-logs-tag/blob/main/src/lambda.py) will ensure each function's CloudWatch Logs log group is also tagged.
 
-All log groups with names beginning with `/aws/lambda/` will be checked to ensure the tags named in the `propagate_tag_names` comma-spearated list exist. If the tags exist and have values set then no action is taken - _Tags are only added or updated if they don't already exist_, or if the current tag value is empty or only whitespace. Missing tags will be added to the log group if the corresponding Lambda function has a tag of the same name.
+All log groups with names beginning with `/aws/lambda/` will be checked to ensure the tags named in the `propagate_tag_names` comma-separated list exist. If the tags exist and have values set then no action is taken - _Tags are only added or updated if they don't already exist, or if the current tag value is empty or only contains whitespace_. Missing tags will be added to each log group with the value from the same named tag on the corresponding Lambda function.
 
-This will determine the regions accessible in your account automatically and process all of them (you do not need to deploy this to each region separately).
+The regions accessible in your account will be determined automatically. It is not necessary to deploy this to each region separately.
 
 Tagging will be automatically triggered according to the `schedule_expression` [schedule expression](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html). The default is to trigger approximately every 23 hours.
 
