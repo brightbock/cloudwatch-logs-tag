@@ -24,7 +24,7 @@ You can deploy with `dry_run = "true"` to see what will happen without actually 
 
 ```
 module "cloudwatch_logs_tag" {
-  source                = "git::https://github.com/brightbock/cloudwatch-logs-tag.git?ref=v0.1.0"
+  source                = "git::https://github.com/brightbock/cloudwatch-logs-tag.git?ref=v0.1.2"
   project_name          = "cloudwatch_logs_tag_from_lambda"
   propagate_tag_names   = "team,project"
   dry_run               = "false"
