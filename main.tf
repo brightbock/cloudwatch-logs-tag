@@ -114,12 +114,9 @@ data "archive_file" "source_zip" {
   output_path = local.lambda_zip_file
 }
 
-resource "aws_lambda_layer_version" "python_packages" {
-  filename                 = "${local.lambda_layer_dir}/package.zip"
-  source_code_hash         = filebase64sha256("${local.lambda_layer_dir}/package.zip")
-  layer_name               = "boto3_botocore_requests"
-  compatible_runtimes      = [var.lambda_runtime]
-  compatible_architectures = ["arm64", "x86_64"]
+module "lambda_layers_python" {
+  count  = length(var.lambda_layers_python) == 0 ? 1 : 0
+  source = "git::https://github.com/brightbock/lambda-layers-python.git?ref=v0.1.0"
 }
 
 resource "aws_lambda_function" "lambda_deploy" {
@@ -134,7 +131,9 @@ resource "aws_lambda_function" "lambda_deploy" {
   architectures    = var.lambda_architectures
   source_code_hash = data.archive_file.source_zip.output_base64sha256
   runtime          = var.lambda_runtime
-  layers           = [aws_lambda_layer_version.python_packages.arn]
+  layers = length(var.lambda_layers_python) == 0 ? [
+    module.lambda_layers_python[0].boto3_botocore_requests_arn,
+  ] : var.lambda_layers_python
   environment {
     variables = local.lambda_function_environment
   }
@@ -142,7 +141,7 @@ resource "aws_lambda_function" "lambda_deploy" {
     data.archive_file.source_zip,
     aws_cloudwatch_log_group.lambda_logs,
     aws_iam_role_policy_attachment.lambda_permissions,
-    aws_lambda_layer_version.python_packages
+    module.lambda_layers_python,
   ]
 }
 
