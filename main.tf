@@ -116,7 +116,7 @@ data "archive_file" "source_zip" {
 
 module "lambda_layers_python" {
   count  = length(var.lambda_layers_python) == 0 ? 1 : 0
-  source = "git::https://github.com/brightbock/lambda-layers-python.git?ref=v0.1.0"
+  source = "git::https://github.com/brightbock/lambda-layers-python.git?ref=v0.2.0"
 }
 
 resource "aws_lambda_function" "lambda_deploy" {
